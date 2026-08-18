@@ -85,10 +85,11 @@ export default function App() {
       setStatus('results');
     } catch (err) {
       console.error('Submission Error:', err);
-      if (err.message.includes('Failed to fetch')) {
-        setError('Cannot connect to the revision backend. Please ensure the backend server is running and accessible.');
+      const errMsg = err?.message || '';
+      if (errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError') || errMsg.includes('Network Error')) {
+        setError('Cannot connect to backend server. If using Render free tier, the backend may be waking up from sleep (~30 seconds). Please click "Retry Processing".');
       } else {
-        setError(err.message || 'Failed to process study material.');
+        setError(errMsg || 'Failed to process study material.');
       }
       setStatus('error');
     }

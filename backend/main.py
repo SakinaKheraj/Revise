@@ -11,11 +11,11 @@ from llm import generate_summary_and_flashcards
 
 app = FastAPI(title="Revise Backend", version="1.0.0")
 
-# CORS setup for development
+# CORS setup for local development and deployed frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins for local utility
-    allow_credentials=True,
+    allow_origins=["*"],  # Allows all origins for local and deployed frontend
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
