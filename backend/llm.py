@@ -1,8 +1,10 @@
 import os
 import json
 import time
-import groq
 from typing import Dict, Any
+from google import genai
+from google.genai import types
+from google.genai.errors import APIError
 
 SYSTEM_PROMPT = """
 You are an expert exam-prep assistant. Your task is to analyze the provided study notes and produce:
@@ -50,10 +52,10 @@ Expected JSON schema:
 
 def generate_summary_and_flashcards(text: str) -> Dict[str, Any]:
     """
-    Calls Groq's API with Llama 3.3 70B model to generate a summary and flashcards.
-    Uses Groq JSON mode and handles rate-limiting with exponential backoff.
+    Calls Gemini API with gemini-2.5-flash model to generate a summary and flashcards.
+    Uses JSON response_mime_type and handles rate-limiting / API errors with exponential backoff.
     """
-    api_key = os.environ.get("GROQ_API_KEY")
+    api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         # Fallback: manually parse local .env file if present
         try:
@@ -61,62 +63,56 @@ def generate_summary_and_flashcards(text: str) -> Dict[str, Any]:
             if os.path.exists(env_path):
                 with open(env_path, "r") as f:
                     for line in f:
-                        if line.strip().startswith("GROQ_API_KEY="):
+                        if line.strip().startswith("GEMINI_API_KEY="):
                             api_key = line.strip().split("=", 1)[1].strip('"\' ')
-                            os.environ["GROQ_API_KEY"] = api_key
+                            os.environ["GEMINI_API_KEY"] = api_key
                             break
         except Exception:
             pass
 
     if not api_key:
-        raise ValueError("GROQ_API_KEY environment variable is not set. Please get a free key at console.groq.com and set it in terminal or in a backend/.env file.")
+        raise ValueError("GEMINI_API_KEY environment variable is not set. Please get a key at aistudio.google.com and set it in terminal or in a backend/.env file.")
 
-    client = groq.Groq(api_key=api_key)
+    client = genai.Client(api_key=api_key)
     
     max_retries = 3
     retry_delay = 2.0  # Initial delay in seconds
     
     for attempt in range(max_retries):
         try:
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": SYSTEM_PROMPT
-                    },
-                    {
-                        "role": "user",
-                        "content": f"Here is the study material:\n\n{text}"
-                    }
-                ],
-                response_format={"type": "json_object"},
-                temperature=0.1
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=f"Here is the study material:\n\n{text}",
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                    response_mime_type="application/json",
+                    temperature=0.1,
+                )
             )
             
-            raw_content = response.choices[0].message.content
+            raw_content = response.text
             if not raw_content:
-                raise ValueError("Groq returned an empty response.")
+                raise ValueError("Gemini API returned an empty response.")
                 
             return json.loads(raw_content.strip())
             
-        except groq.RateLimitError as rl_err:
+        except APIError as api_err:
             if attempt == max_retries - 1:
-                raise RuntimeError(f"Groq API rate limit exceeded. Please try again. Details: {str(rl_err)}")
-            print(f"Groq rate limit hit on attempt {attempt + 1}. Retrying in {retry_delay}s...")
+                raise RuntimeError(f"Gemini API error occurred: {str(api_err)}")
+            print(f"Gemini API error on attempt {attempt + 1}: {str(api_err)}. Retrying in {retry_delay}s...")
             time.sleep(retry_delay)
             retry_delay *= 2.0
             
-        except (json.JSONDecodeError, groq.APIError) as api_err:
-            # Catch JSON decoding failures and API Gateway validation errors and retry
+        except json.JSONDecodeError as json_err:
             if attempt == max_retries - 1:
-                raise RuntimeError(f"Groq processing failed after validation/parsing errors: {str(api_err)}")
-            print(f"Groq validation/parsing failed on attempt {attempt + 1}: {str(api_err)}. Retrying in {retry_delay}s...")
+                raise RuntimeError(f"Gemini output parsing failed after validation/parsing errors: {str(json_err)}")
+            print(f"Gemini parsing failed on attempt {attempt + 1}: {str(json_err)}. Retrying in {retry_delay}s...")
             time.sleep(retry_delay)
             retry_delay *= 1.5
             
         except Exception as err:
             # Serious uncaught failures
-            raise RuntimeError(f"Failed to process flashcards with Groq: {str(err)}")
+            raise RuntimeError(f"Failed to process flashcards with Gemini: {str(err)}")
             
     raise RuntimeError("Failed to generate flashcards after multiple attempts.")
+

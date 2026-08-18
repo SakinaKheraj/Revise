@@ -10,7 +10,7 @@ Revise is a minimal, exam-oriented full-stack web application designed for stude
 ## Tech Stack
 - **Backend:** FastAPI (Python 3.11+), Uvicorn, pypdf (for PDF text extraction)
 - **Frontend:** React (Vite), Plain CSS (custom dark-mode glassmorphic theme), Lucide React
-- **LLM:** Groq API (Llama 3.3 70B: `llama-3.3-70b-versatile`)
+- **LLM:** Gemini API (Gemini 2.5 Flash: `gemini-2.5-flash`)
 
 ---
 
@@ -40,18 +40,18 @@ Revise is a minimal, exam-oriented full-stack web application designed for stude
    ```bash
    pip install -r requirements.txt
    ```
-4. Set your Groq API Key environment variable (grab a free key at console.groq.com):
+4. Set your Gemini API Key environment variable (grab a key at aistudio.google.com):
    * **Windows (Command Prompt):**
      ```cmd
-     set GROQ_API_KEY=your_api_key_here
+     set GEMINI_API_KEY=your_api_key_here
      ```
    * **Windows (PowerShell):**
      ```powershell
-     $env:GROQ_API_KEY="your_api_key_here"
+     $env:GEMINI_API_KEY="your_api_key_here"
      ```
    * **macOS/Linux:**
      ```bash
-     export GROQ_API_KEY="your_api_key_here"
+     export GEMINI_API_KEY="your_api_key_here"
      ```
 5. Run the backend server with Uvicorn:
    ```bash
