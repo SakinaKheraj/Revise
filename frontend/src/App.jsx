@@ -7,7 +7,7 @@ import FlashcardDeck from './components/FlashcardDeck';
 import ExportButton from './components/ExportButton';
 import ErrorBanner from './components/ErrorBanner';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://revise-backend-m1rp.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://revise-zu2s.onrender.com';
 
 export default function App() {
   const [status, setStatus] = useState('idle'); // idle | loading | results | error

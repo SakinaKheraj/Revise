@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Download, Loader2 } from 'lucide-react';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://revise-backend-m1rp.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://revise-zu2s.onrender.com';
 
 export default function ExportButton({ flashcards }) {
   const [isExporting, setIsExporting] = useState(false);

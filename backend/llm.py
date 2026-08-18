@@ -52,7 +52,7 @@ Expected JSON schema:
 
 def generate_summary_and_flashcards(text: str) -> Dict[str, Any]:
     """
-    Calls Gemini API with gemini-2.5-flash model to generate a summary and flashcards.
+    Calls Gemini API with gemini-3.6-flash model to generate a summary and flashcards.
     Uses JSON response_mime_type and handles rate-limiting / API errors with exponential backoff.
     """
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -74,6 +74,7 @@ def generate_summary_and_flashcards(text: str) -> Dict[str, Any]:
         raise ValueError("GEMINI_API_KEY environment variable is not set. Please get a key at aistudio.google.com and set it in terminal or in a backend/.env file.")
 
     client = genai.Client(api_key=api_key)
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.6-flash")
     
     max_retries = 3
     retry_delay = 2.0  # Initial delay in seconds
@@ -81,7 +82,7 @@ def generate_summary_and_flashcards(text: str) -> Dict[str, Any]:
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model=model_name,
                 contents=f"Here is the study material:\n\n{text}",
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_PROMPT,

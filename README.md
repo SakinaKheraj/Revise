@@ -10,7 +10,7 @@ Revise is a minimal, exam-oriented full-stack web application designed for stude
 ## Tech Stack
 - **Backend:** FastAPI (Python 3.11+), Uvicorn, pypdf (for PDF text extraction)
 - **Frontend:** React (Vite), Plain CSS (custom dark-mode glassmorphic theme), Lucide React
-- **LLM:** Gemini API (Gemini 2.5 Flash: `gemini-2.5-flash`)
+- **LLM:** Gemini API (Gemini 3.6 Flash: `gemini-3.6-flash`)
 
 ---
 
