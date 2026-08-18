@@ -1,0 +1,23 @@
+# Version Control Ignore File
+
+# Backend Virtual Environment and Configuration
+backend/.venv/
+backend/.env
+backend/__pycache__/
+backend/*.pyc
+
+# Frontend Dependencies and Build Outputs
+frontend/node_modules/
+frontend/dist/
+frontend/.cache/
+frontend/package-lock.json
+
+# Local Environment variables
+.env
+.env.local
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
